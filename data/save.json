@@ -20,7 +20,7 @@
     }
   },
   "highscores": {
-    "story": 100
+    "story": 360
   },
   "achievements": {},
   "settings": {
@@ -35,9 +35,9 @@
   },
   "daily_challenge_on": false,
   "daily_seed": 0,
-  "story_max_unlocked": 2,
-  "story_best": 100,
-  "wallet": 15,
+  "story_max_unlocked": 20,
+  "story_best": 360,
+  "wallet": 20270,
   "tutorial_completed": false,
   "completed_tutorials": [
     1
@@ -48,13 +48,20 @@
     "block_hp": 1,
     "tetris_time_bonus": 0
   },
-  "checkpoint_hearts": {},
+  "checkpoint_hearts": {
+    "6": 4
+  },
   "owned_books": [],
   "achievement_progress": {
-    "first_steps": 1
+    "first_steps": 1,
+    "checkpoint_champion": 1,
+    "getting_started": 6
   },
   "unlocked_achievements": [
-    "first_steps"
+    "first_steps",
+    "getting_started"
   ],
-  "claimed_achievements": []
+  "claimed_achievements": [
+    "first_steps"
+  ]
 }

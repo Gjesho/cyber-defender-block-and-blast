@@ -227,14 +227,16 @@ class WaveHubScene(BaseScene):
                 if current_hearts == 1:
                     check_achievement(sd, "close_call", 1)
                 
-                # Story progress achievements based on level (updated for 20 levels)
+                # Story progress achievements based on 20-level structure
                 if self.stage >= 1:
                     check_achievement(sd, "first_steps", self.stage)
-                if self.stage >= 5:
-                    check_achievement(sd, "getting_started", self.stage)
-                if self.stage >= 10:
+                if self.stage >= 6:
+                    check_achievement(sd, "tutorial_graduate", self.stage)
+                if self.stage >= 8:
+                    check_achievement(sd, "first_boss", self.stage)
+                if self.stage >= 14:
                     check_achievement(sd, "halfway_there", self.stage)
-                if self.stage >= 15:
+                if self.stage >= 17:
                     check_achievement(sd, "almost_done", self.stage)
                 if self.stage >= 20:
                     check_achievement(sd, "cyber_hero", self.stage)

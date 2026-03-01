@@ -17,19 +17,19 @@ class AchievementsScene(BaseScene):
 
     def _layout(self):
         w, h = self.app.screen.get_size()
-        self.panel = pg.Rect(w // 2 - 560, h // 2 - 340, 1120, 680)
+        self.panel = pg.Rect(w // 2 - 560, h // 2 - 330, 1120, 660)
 
     def handle_event(self, ev):
         if ev.type == pg.VIDEORESIZE:
             self._layout()
-        
+
         # Mouse wheel scrolling
         if ev.type == pg.MOUSEWHEEL:
             mx, my = pg.mouse.get_pos()
             if self.panel.collidepoint(mx, my):
                 self.scroll_target -= ev.y * 50
                 self.scroll_target = max(0.0, min(self.scroll_target, self.scroll_max))
-        
+
         for b in self.btns:
             b.handle(ev)
 
@@ -45,181 +45,192 @@ class AchievementsScene(BaseScene):
         lang = sd.settings.lang
         colors, fonts = app.colors, app.fonts
         self.draw_background(surf, colors)
-        
+
         title = "Achievements" if lang == "en" else "Достигнувања"
         draw_panel(surf, self.panel, colors, title=title, title_font=fonts.ui_bold)
 
         self.btns = []
 
-        # Progress header with better styling
+        # ── Progress header ──────────────────────────────────────────────
         unlocked = get_unlocked_count(sd)
         total = get_total_count()
         progress_pct = int((unlocked / total) * 100) if total > 0 else 0
-        
-        header_y = self.panel.y + 75
-        
-        # Progress text
-        progress_text = f"{unlocked}/{total} Unlocked ({progress_pct}%)" if lang == "en" else f"{unlocked}/{total} Отклучени ({progress_pct}%)"
-        draw_text(surf, progress_text, fonts.ui_bold, colors["accent"], (self.panel.x + 40, header_y), max_w=self.panel.w - 80)
-        
+
+        header_y = self.panel.y + 48
+        progress_label = (
+            f"{unlocked}/{total} Unlocked ({progress_pct}%)"
+            if lang == "en"
+            else f"{unlocked}/{total} Отклучени ({progress_pct}%)"
+        )
+        draw_text(surf, progress_label, fonts.ui_bold, colors["accent"],
+                  (self.panel.x + 40, header_y), max_w=self.panel.w - 80)
+
         # Overall progress bar
         bar_x = self.panel.x + 40
-        bar_y = header_y + 30
+        bar_y = header_y + 26
         bar_w = self.panel.w - 80
-        bar_h = 16
-        
-        pg.draw.rect(surf, colors["line"], (bar_x, bar_y, bar_w, bar_h), border_radius=8)
+        bar_h = 12
+        pg.draw.rect(surf, colors["line"], (bar_x, bar_y, bar_w, bar_h), border_radius=6)
         if total > 0:
             fill_w = int((unlocked / total) * bar_w)
             if fill_w > 0:
-                pg.draw.rect(surf, colors["accent"], (bar_x, bar_y, fill_w, bar_h), border_radius=8)
+                pg.draw.rect(surf, colors["accent"], (bar_x, bar_y, fill_w, bar_h), border_radius=6)
 
-        # Scrollable area for achievements
-        view = pg.Rect(self.panel.x + 40, self.panel.y + 130, self.panel.w - 80, self.panel.h - 220)
+        # ── Scrollable card area ─────────────────────────────────────────
+        # Leave 20px above and 70px below for back button
+        content_top = bar_y + bar_h + 16
+        content_bot = self.panel.bottom - 70
+        view = pg.Rect(self.panel.x + 20, content_top, self.panel.w - 40, content_bot - content_top)
+
+        # Grid layout — 4 columns, fixed sizes for 1280x720
+        cols = 4
+        gap_x = 12
+        gap_y = 12
+        card_w = (view.w - gap_x * (cols - 1) - 14) // cols   # 14 = scrollbar clearance
+        pad = 12
+        card_h = 155
+
+        # Total content height for scrolling
+        rows = (len(ACHIEVEMENTS) + cols - 1) // cols
+        content_height = rows * (card_h + gap_y) - gap_y
+        self.scroll_max = max(0, content_height - view.h)
 
         # Clip to viewport
         old_clip = surf.get_clip()
         surf.set_clip(view)
 
-        # Achievement grid: 4 columns for better spacing
-        cols = 4
-        card_w = 240
-        card_h = 160
-        gap_x = 18
-        gap_y = 20
-        
-        # Calculate total grid width to center it
-        total_grid_w = cols * card_w + (cols - 1) * gap_x
-        start_x = view.x + (view.w - total_grid_w) // 2
+        start_x = view.x
         start_y = view.y - int(self.scroll)
 
-        # Calculate total content height for scrolling
-        rows = (len(ACHIEVEMENTS) + cols - 1) // cols
-        content_height = rows * (card_h + gap_y) - gap_y
-        self.scroll_max = max(0, content_height - view.h)
-
         # Draw achievement cards
-        achievement_list = list(ACHIEVEMENTS.values())
-        for i, achievement in enumerate(achievement_list):
+        for i, achievement in enumerate(ACHIEVEMENTS.values()):
             row = i // cols
             col = i % cols
-            
+
             x = start_x + col * (card_w + gap_x)
             y = start_y + row * (card_h + gap_y)
-            
+
             card_rect = pg.Rect(x, y, card_w, card_h)
-            
-            # Only draw if visible
-            if card_rect.bottom < view.y - 20 or card_rect.top > view.bottom + 20:
+
+            # Visibility cull
+            if card_rect.bottom < view.y - 10 or card_rect.top > view.bottom + 10:
                 continue
-            
-            # Check if unlocked
+
             is_unlocked = achievement.id in sd.unlocked_achievements
-            
-            # Hover effect
+            is_claimed  = achievement.id in sd.claimed_achievements
             mx, my = pg.mouse.get_pos()
             is_hovered = card_rect.collidepoint(mx, my)
-            
-            # Card background with hover
+
+            # Card colours
             if is_unlocked:
-                if is_hovered:
-                    bg_color = colors["panel2"]
-                    border_color = colors["accent"]
-                else:
-                    bg_color = colors["panel"]
-                    border_color = colors["accent"]
-                text_color = colors["text"]
+                bg_color     = colors["panel2"] if is_hovered else colors["panel"]
+                border_color = colors["accent"]
+                text_color   = colors["text"]
             else:
-                bg_color = (colors["panel"][0] // 2, colors["panel"][1] // 2, colors["panel"][2] // 2)
+                p = colors["panel"]
+                bg_color     = (p[0] // 2, p[1] // 2, p[2] // 2)
                 border_color = colors["line"]
-                text_color = colors["muted"]
-            
+                text_color   = colors["muted"]
+
             pg.draw.rect(surf, bg_color, card_rect, border_radius=12)
             pg.draw.rect(surf, border_color, card_rect, width=2, border_radius=12)
-            
-            # Achievement name
+
+            inner_w = card_w - pad * 2
+
+            # ── Achievement name ────────────────────────────────────────
             name = achievement.name_en if lang == "en" else achievement.name_mk
-            name_y = card_rect.y + 16
-            draw_text(surf, name, fonts.ui_bold, text_color, (card_rect.x + 16, name_y), max_w=card_w - 32)
-            
-            # Achievement description + reward
+            draw_text(surf, name, fonts.ui_bold, text_color,
+                      (card_rect.x + pad, card_rect.y + pad), max_w=inner_w)
+
+            # ── Description (clean — no newlines, no emoji) ─────────────
             desc = achievement.desc_en if lang == "en" else achievement.desc_mk
-            # Add reward info to description
+            # Strip any stray newlines/emoji-like chars
+            desc = desc.replace("\n", " ").replace("\r", " ").strip()
+            desc_y = card_rect.y + pad + fonts.ui_bold.get_height() + 6
+            desc_end_y = draw_text(surf, desc, fonts.ui, text_color,
+                                   (card_rect.x + pad, desc_y), max_w=inner_w)
+
+            # ── Reward line (separate, muted yellow) ─────────────────────
             if achievement.reward_coins > 0:
-                reward_text = f"Reward: {achievement.reward_coins} coins" if lang == "en" else f"Награда: {achievement.reward_coins} coins"
-                desc = f"{desc}\n{reward_text}"
-            desc_y = card_rect.y + 45
-            draw_text(surf, desc, fonts.ui, text_color, (card_rect.x + 16, desc_y), max_w=card_w - 32)
-            
-            # Check if claimed
-            is_claimed = achievement.id in sd.claimed_achievements
-            
-            # Bottom section: progress bar, claim button, or claimed status
+                reward_label = (
+                    f"Reward: {achievement.reward_coins} coins"
+                    if lang == "en"
+                    else f"Награда: {achievement.reward_coins} coins"
+                )
+                reward_y = desc_end_y + 2
+                draw_text(surf, reward_label, fonts.ui, colors["yellow"],
+                          (card_rect.x + pad, reward_y), max_w=inner_w)
+
+            # ── Bottom section (only draw when card bottom is in view) ──
+            bottom_area_y = card_rect.bottom - 36
+            # Only hide bottom elements if the card bottom is outside the view
+            # (avoids claim button / progress bar floating over the header or off-screen)
+            card_fully_visible = (card_rect.bottom - 40) >= view.y and card_rect.bottom <= view.bottom
+
             if not is_unlocked:
-                # NOT UNLOCKED - Show progress bar for incremental achievements
-                if achievement.requirement > 1:
+                # Progress bar for incremental achievements
+                if achievement.requirement > 1 and card_fully_visible:
                     current, required = get_achievement_progress(sd, achievement.id)
-                    
-                    # Progress text
-                    progress_text = f"{current}/{required}"
-                    prog_y = card_rect.bottom - 45
-                    draw_text(surf, progress_text, fonts.ui, text_color, (card_rect.x + 16, prog_y), max_w=card_w - 32)
-                    
-                    # Progress bar
-                    bar_x = card_rect.x + 16
-                    bar_y = card_rect.bottom - 22
-                    bar_w = card_w - 32
-                    bar_h = 10
-                    
-                    # Background
-                    pg.draw.rect(surf, colors["line"], (bar_x, bar_y, bar_w, bar_h), border_radius=5)
-                    
-                    # Fill
-                    if required > 0:
-                        fill_w = int((current / required) * bar_w)
-                        if fill_w > 0:
-                            pg.draw.rect(surf, colors["accent"], (bar_x, bar_y, fill_w, bar_h), border_radius=5)
-            
+                    prog_text = f"{current}/{required}"
+                    draw_text(surf, prog_text, fonts.ui, text_color,
+                              (card_rect.x + pad, bottom_area_y - 2), max_w=inner_w)
+
+                    bx = card_rect.x + pad
+                    by = card_rect.bottom - 18
+                    bw = card_w - pad * 2
+                    bh = 8
+                    pg.draw.rect(surf, colors["line"], (bx, by, bw, bh), border_radius=4)
+                    if required > 0 and current > 0:
+                        fw = int((min(current, required) / required) * bw)
+                        pg.draw.rect(surf, colors["accent"], (bx, by, fw, bh), border_radius=4)
+
             elif not is_claimed:
-                # UNLOCKED BUT NOT CLAIMED - Show claim button
-                claim_btn_rect = pg.Rect(card_rect.x + 16, card_rect.bottom - 40, card_w - 32, 30)
-                claim_text = f"CLAIM +{achievement.reward_coins}" if lang == "en" else f"ЗЕМИ +{achievement.reward_coins}"
-                
-                def make_claim_callback(ach_id):
-                    def claim_callback():
-                        coins_earned = claim_achievement(sd, ach_id)
-                        if coins_earned > 0:
-                            from ..save_system import save
-                            save(sd)
-                    return claim_callback
-                
-                self.btns.append(Button(claim_btn_rect, claim_text, make_claim_callback(achievement.id)))
-            
+                # Claim button — only register when card is fully visible
+                if card_fully_visible:
+                    claim_rect = pg.Rect(card_rect.x + pad, bottom_area_y - 4, card_w - pad * 2, 30)
+                    claim_text = (
+                        f"CLAIM +{achievement.reward_coins}"
+                        if lang == "en"
+                        else f"ЗЕМИ +{achievement.reward_coins}"
+                    )
+
+                    def make_claim(ach_id):
+                        def _cb():
+                            coins = claim_achievement(sd, ach_id)
+                            if coins > 0:
+                                from ..save_system import save
+                                save(sd)
+                        return _cb
+
+                    self.btns.append(Button(claim_rect, claim_text, make_claim(achievement.id)))
+
             else:
-                # CLAIMED - Show checkmark and claimed status
-                status_text = "CLAIMED" if lang == "en" else "ЗЕМЕНО"
-                status_y = card_rect.bottom - 28
-                draw_text(surf, status_text, fonts.ui_bold, colors["good"], (card_rect.x + 16, status_y), max_w=card_w - 32)
+                # Already claimed
+                if card_fully_visible:
+                    status = "CLAIMED" if lang == "en" else "ЗЕМЕНО"
+                    draw_text(surf, status, fonts.ui_bold, colors["good"],
+                              (card_rect.x + pad, bottom_area_y), max_w=inner_w)
 
         # Restore clip
         surf.set_clip(old_clip)
 
-        # Scroll bar (if needed)
+        # ── Scrollbar ────────────────────────────────────────────────────
         if self.scroll_max > 0:
-            track_x = view.right - 10
-            track = pg.Rect(track_x, view.y, 8, view.h)
-            pg.draw.rect(surf, colors["line"], track, border_radius=4)
-            
-            knob_h = max(40, int(view.h * (view.h / (view.h + self.scroll_max))))
+            track_x = view.right - 8
+            track = pg.Rect(track_x, view.y, 6, view.h)
+            pg.draw.rect(surf, colors["line"], track, border_radius=3)
+            knob_h = max(30, int(view.h * (view.h / (view.h + self.scroll_max))))
             knob_y = int(view.y + (view.h - knob_h) * (self.scroll / self.scroll_max))
-            knob = pg.Rect(track_x, knob_y, 8, knob_h)
-            pg.draw.rect(surf, colors["accent"], knob, border_radius=4)
+            knob = pg.Rect(track_x, knob_y, 6, knob_h)
+            pg.draw.rect(surf, colors["accent"], knob, border_radius=3)
 
-        # Back button
-        back = pg.Rect(self.panel.x + 40, self.panel.bottom - 70, 200, 50)
-        back_text = "Back" if lang == "en" else "Назад"
-        self.btns.append(Button(back, back_text, lambda: change_scene(app, __import__('src.scenes.menu', fromlist=['MenuScene']).MenuScene(app))))
+        # ── Back button ──────────────────────────────────────────────────
+        back_rect = pg.Rect(self.panel.x + 40, self.panel.bottom - 62, 180, 46)
+        back_text  = "Back" if lang == "en" else "Назад"
+        menu_mod   = __import__('src.scenes.menu', fromlist=['MenuScene'])
+        self.btns.append(Button(back_rect, back_text,
+                                lambda: change_scene(app, menu_mod.MenuScene(app))))
 
-        # Draw buttons
+        # Draw all buttons
         for b in self.btns:
             b.draw(surf, fonts.ui_bold, colors, hover_state(b.rect))

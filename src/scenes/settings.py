@@ -8,8 +8,6 @@ from ..core import change_scene, apply_settings
 from ..save_system import save, default_save
 from ..constants import START_LIVES
 
-RES_OPTIONS = [(1280,720),(1366,768),(1600,900),(1920,1080)]
-
 
 class SettingsScene(BaseScene):
     def enter(self, **kwargs):
@@ -54,25 +52,12 @@ class SettingsScene(BaseScene):
         sd.settings.lang = "mk" if sd.settings.lang == "en" else "en"
         save(sd)
 
-    def _cycle_res(self):
-        app = self.app
-        sd = app.save
-        cur = tuple(sd.settings.resolution)
-        try:
-            idx = RES_OPTIONS.index(cur)
-        except ValueError:
-            idx = -1
-        idx = (idx + 1) % len(RES_OPTIONS)
-        w, h = RES_OPTIONS[idx]
-        sd.settings.resolution = [w, h]
-        apply_settings(app, sd.settings)
-        save(sd)
 
     def _toggle_fullscreen(self):
         app = self.app
         sd = app.save
         sd.settings.fullscreen = not sd.settings.fullscreen
-        apply_settings(app, sd.settings)
+        apply_settings(app)
         save(sd)
 
     def _adjust_music(self, delta: int):
@@ -167,15 +152,6 @@ class SettingsScene(BaseScene):
         lang_btn = pg.Rect(panel.x + 500, y0 - 6, 300, 42)
         lang_text = "Македонски" if lang == "mk" else "English"
         self.btns.append(Button(lang_btn, lang_text, self._cycle_lang))
-        y0 += 64
-
-        # Resolution
-        res_label = "Resolution" if lang == "en" else "Резолуција"
-        draw_text(surf, res_label, fonts.ui_bold, colors["text"], (x0, y0), max_w=400)
-        
-        res_btn = pg.Rect(panel.x + 500, y0 - 6, 300, 42)
-        res_text = f"{sd.settings.resolution[0]}x{sd.settings.resolution[1]}"
-        self.btns.append(Button(res_btn, res_text, self._cycle_res))
         y0 += 64
 
         # Fullscreen

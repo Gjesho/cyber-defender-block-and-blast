@@ -25,10 +25,8 @@ class Settings:
     def normalize(self):
         if self.lang not in ("mk", "en"):
             self.lang = "mk"
-        if not (isinstance(self.resolution, list) and len(self.resolution) == 2):
-            self.resolution = [DEFAULT_RES[0], DEFAULT_RES[1]]
-        self.resolution[0] = int(self.resolution[0])
-        self.resolution[1] = int(self.resolution[1])
+        # Resolution is always fixed at 1280x720
+        self.resolution = [DEFAULT_RES[0], DEFAULT_RES[1]]
         self.music_vol = _clamp01(self.music_vol)
         self.sfx_vol = _clamp01(self.sfx_vol)
 

@@ -91,6 +91,8 @@ def apply_settings(app: App):
     app.screen = set_display(res, app.save.settings.fullscreen)
     app.fonts = load_fonts(scale=max(1.0, res[1]/720))
     save(app.save)
+    # Notify the active scene so it re-calculates its layout for the new resolution
+    pg.event.post(pg.event.Event(pg.VIDEORESIZE, {'w': res[0], 'h': res[1], 'size': res}))
 
 async def main_loop(app: App):
     while app.running:

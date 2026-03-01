@@ -26,7 +26,7 @@ class Achievement:
 
 # All 25 achievements
 ACHIEVEMENTS = {
-    # Story Progress (5)
+    # Story Progress (6)
     "first_steps": Achievement(
         id="first_steps",
         name_en="First Steps",
@@ -37,45 +37,55 @@ ACHIEVEMENTS = {
         requirement=1,
         reward_coins=50
     ),
-    "getting_started": Achievement(
-        id="getting_started",
-        name_en="Getting Started",
-        name_mk="Добар почеток",
-        desc_en="Complete level 5",
-        desc_mk="Заврши ниво 5",
+    "tutorial_graduate": Achievement(
+        id="tutorial_graduate",
+        name_en="Tutorial Graduate",
+        name_mk="Дипломиран тutorijal",
+        desc_en="Complete all 6 tutorial levels",
+        desc_mk="Заврши ги сите 6 туторијал нивоа",
         category="story",
-        requirement=5,
-        reward_coins=150
+        requirement=6,
+        reward_coins=200
+    ),
+    "first_boss": Achievement(
+        id="first_boss",
+        name_en="Boss Slayer",
+        name_mk="Убиец на боеви",
+        desc_en="Defeat The Fake Prize Ship (level 8)",
+        desc_mk="Порази го The Fake Prize Ship (ниво 8)",
+        category="story",
+        requirement=8,
+        reward_coins=300
     ),
     "halfway_there": Achievement(
         id="halfway_there",
         name_en="Halfway There",
         name_mk="Половина готово",
-        desc_en="Complete level 10",
-        desc_mk="Заврши ниво 10",
+        desc_en="Defeat The DM Magnet (level 14)",
+        desc_mk="Порази го The DM Magnet (ниво 14)",
         category="story",
-        requirement=10,
-        reward_coins=300
+        requirement=14,
+        reward_coins=500
     ),
     "almost_done": Achievement(
         id="almost_done",
         name_en="Almost Done",
         name_mk="Речиси готово",
-        desc_en="Complete level 13",
-        desc_mk="Заврши ниво 13",
+        desc_en="Defeat The Profile Snatcher (level 17)",
+        desc_mk="Порази го The Profile Snatcher (ниво 17)",
         category="story",
-        requirement=13,
-        reward_coins=600
+        requirement=17,
+        reward_coins=750
     ),
     "cyber_hero": Achievement(
         id="cyber_hero",
         name_en="Cyber Hero",
         name_mk="Кибер херој",
-        desc_en="Complete all 15 levels",
-        desc_mk="Заврши сите 15 нивоа",
+        desc_en="Defeat The Cyber Overlord and complete all 20 levels",
+        desc_mk="Порази го The Cyber Overlord и заврши ги сите 20 нивоа",
         category="story",
-        requirement=15,
-        reward_coins=1000
+        requirement=20,
+        reward_coins=1500
     ),
     
     # Quiz Master (4)
@@ -315,7 +325,13 @@ def check_achievement(sd: SaveData, achievement_id: str, value: int = None) -> b
         value = 1
     
     # Some achievements check current state, others track cumulative progress
-    if achievement_id in ["wealthy", "rich", "fully_upgraded", "library_regular"]:
+    CURRENT_STATE = [
+        "wealthy", "rich", "fully_upgraded", "library_regular",
+        # Story milestones – pass the current stage, check against requirement
+        "first_steps", "tutorial_graduate", "first_boss",
+        "halfway_there", "almost_done", "cyber_hero",
+    ]
+    if achievement_id in CURRENT_STATE:
         # These check current state, not cumulative
         current_value = value
     else:
