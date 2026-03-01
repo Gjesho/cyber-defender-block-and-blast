@@ -15,12 +15,12 @@ a = Analysis(
         ('assets', 'assets'),
         # Bundle the data folder (save.json)
         ('data', 'data'),
-        # Bundle root-level images
-        ('heart.png', '.'),
-        # Bundle book text files
-        ('book1.txt', '.'),
-        ('book2.txt', '.'),
-        ('book3.txt', '.'),
+        # Bundle heart image from assets
+        ('assets/heart.png', '.'),
+        # Bundle book text files from data/books
+        ('data/books/book1.txt', '.'),
+        ('data/books/book2.txt', '.'),
+        ('data/books/book3.txt', '.'),
     ],
     hiddenimports=[
         'PIL',

@@ -17,9 +17,9 @@ class QuizScene(BaseScene):
         self.stage = int(stage)
         self.wave = int(wave)
 
-        # Load books from project root
+        # Load books from data/books/
         project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        self.books = load_all_books(project_root)
+        self.books = load_all_books(os.path.join(project_root, "data", "books"))
         
         # Get appropriate book for current level
         self.current_book = get_book_for_level(self.stage, self.books)
