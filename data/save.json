@@ -1,0 +1,60 @@
+{
+  "version": 2,
+  "coins": 0,
+  "xp": 0,
+  "unlocked_world": 1,
+  "cosmetics": {
+    "ship_skin": 0,
+    "trail": 0,
+    "firewall_palette": 0,
+    "unlocked": {
+      "ship_skin": [
+        0
+      ],
+      "trail": [
+        0
+      ],
+      "firewall_palette": [
+        0
+      ]
+    }
+  },
+  "highscores": {
+    "story": 100
+  },
+  "achievements": {},
+  "settings": {
+    "lang": "en",
+    "resolution": [
+      1280,
+      720
+    ],
+    "fullscreen": false,
+    "music_vol": 0.8,
+    "sfx_vol": 1.0
+  },
+  "daily_challenge_on": false,
+  "daily_seed": 0,
+  "story_max_unlocked": 2,
+  "story_best": 100,
+  "wallet": 15,
+  "tutorial_completed": false,
+  "completed_tutorials": [
+    1
+  ],
+  "upgrades": {
+    "obstacle_slots": 1,
+    "fire_rate_lvl": 1,
+    "block_hp": 1,
+    "tetris_time_bonus": 0
+  },
+  "checkpoint_hearts": {},
+  "owned_books": [],
+  "achievement_progress": {
+    "first_steps": 1
+  },
+  "unlocked_achievements": [
+    "first_steps"
+  ],
+  "claimed_achievements": []
+}
