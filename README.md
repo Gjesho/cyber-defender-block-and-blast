@@ -6,7 +6,7 @@
 
 ## Overview
 
-**Cyber Defender: Block & Blast** is a solo-developed game that blends two classic arcade genres into a cohesive gameplay loop. Players defend against cyber-threat enemies by first constructing a firewall using falling Tetris pieces, then fighting off waves of invaders with a ship in real time. Between waves, educational scenario cards present internet-safety dilemmas whose outcomes feed back into the game as buffs or debuffs.
+**Cyber Defender: Block & Blast** is a team-developed game that blends two classic arcade genres into a cohesive gameplay loop. Players defend against cyber-threat enemies by first constructing a firewall using falling Tetris pieces, then fighting off waves of invaders with a ship in real time. Between waves, educational scenario cards present internet-safety dilemmas whose outcomes feed back into the game as buffs or debuffs.
 
 The project demonstrates end-to-end game development in Python — custom engine, scene management, save/load system, localization, progression, UI, and a modular content pipeline — without relying on any game-development framework beyond raw Pygame.
 
