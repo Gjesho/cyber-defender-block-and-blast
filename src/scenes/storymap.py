@@ -6,9 +6,8 @@ from ..ui import Button, draw_panel, hover_state
 from ..localization import TEXT
 from ..core import change_scene
 from ..constants import START_LIVES
-from .build import BuildScene
 
-LEVEL_COUNT = 20  # Updated from 15 to 20 (tutorial 0-5 + main game 6-20)
+LEVEL_COUNT = 20  # 0..20 inclusive (6 tutorials + 14 main levels + final boss)
 
 
 class StoryMapScene(BaseScene):
@@ -247,5 +246,4 @@ class StoryMapScene(BaseScene):
 
 def _go_menu(app):
     from .menu import MenuScene
-    from ..core import change_scene
     change_scene(app, MenuScene(app))

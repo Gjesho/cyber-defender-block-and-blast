@@ -35,9 +35,9 @@
   },
   "daily_challenge_on": false,
   "daily_seed": 0,
-  "story_max_unlocked": 20,
+  "story_max_unlocked": 1,
   "story_best": 360,
-  "wallet": 20270,
+  "wallet": 0,
   "tutorial_completed": false,
   "completed_tutorials": [
     1
